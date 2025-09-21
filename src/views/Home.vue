@@ -6,11 +6,9 @@
       <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center animate-fade-in">
           <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            Your Personal
             <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-400">
-              Climate Action
+              EcoAction AI
             </span>
-            Assistant
           </h1>
           <p class="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed">
             Track your carbon footprint, get personalized recommendations, and join challenges to make a real impact on our planet.
@@ -85,25 +83,6 @@
       </div>
     </section>
 
-    <!-- Stats Section -->
-    <section class="py-20 bg-slate-100">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid md:grid-cols-3 gap-8 text-center">
-          <div class="animate-slide-up">
-            <div class="text-4xl font-bold text-primary-600 mb-2">10,000+</div>
-            <div class="text-slate-600 font-medium">Active Users</div>
-          </div>
-          <div class="animate-slide-up" style="animation-delay: 0.2s">
-            <div class="text-4xl font-bold text-green-600 mb-2">2.5M kg</div>
-            <div class="text-slate-600 font-medium">CO₂ Saved</div>
-          </div>
-          <div class="animate-slide-up" style="animation-delay: 0.4s">
-            <div class="text-4xl font-bold text-purple-600 mb-2">500+</div>
-            <div class="text-slate-600 font-medium">Challenges Completed</div>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <!-- CTA Section -->
     <section class="py-20 bg-gradient-to-r from-primary-600 to-primary-800 text-white">
@@ -120,6 +99,15 @@
         </RouterLink>
       </div>
     </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 text-white py-8">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <p class="text-slate-400">
+          © 2024 All rights reserved - Cloudy's Climate
+        </p>
+      </div>
+    </footer>
   </div>
 </template>
 

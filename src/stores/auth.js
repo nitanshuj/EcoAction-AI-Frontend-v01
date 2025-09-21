@@ -1,13 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { supabase } from '../lib/supabase'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
   const profile = ref(null)
   const loading = ref(false)
   const error = ref(null)
-  const sessionInitialized = ref(false)
+  const sessionInitialized = ref(true)
 
   const isAuthenticated = computed(() => !!user.value)
   const isLoading = computed(() => loading.value)
@@ -44,84 +43,44 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   /**
-   * Fetch user profile data
+   * Mock user profile data
    */
-  const fetchUserProfile = async (userId = null) => {
-    try {
-      const targetUserId = userId || user.value?.id
-      if (!targetUserId) return null
-
-      const { data, error: profileError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', targetUserId)
-        .single()
-
-      if (profileError) {
-        console.warn('Profile fetch error:', profileError)
-        return null
-      }
-
-      profile.value = data
-      return data
-    } catch (err) {
-      console.error('Error fetching profile:', err)
-      return null
+  const createMockProfile = (email, userData) => {
+    return {
+      id: Date.now().toString(),
+      email: email,
+      first_name: userData?.firstName || 'Demo',
+      last_name: userData?.lastName || 'User',
+      age: userData?.age || 25,
+      onboarding_status: false,
+      created_at: new Date().toISOString()
     }
   }
 
   /**
-   * Sign up new user with profile creation
+   * Sign up new user (mock implementation)
    */
   const signUp = async (email, password, userData) => {
     loading.value = true
     error.value = null
 
     try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000))
+
+      // Create mock user and profile
+      const mockUser = {
+        id: Date.now().toString(),
         email: email.trim().toLowerCase(),
-        password,
-        options: {
-          data: {
-            first_name: userData.firstName,
-            last_name: userData.lastName
-          }
-        }
-      })
-
-      if (signUpError) throw signUpError
-
-      // If user is created immediately (no email confirmation required)
-      if (data.user && !data.user.email_confirmed_at) {
-        user.value = data.user
-
-        // Create user profile
-        try {
-          const { error: profileError } = await supabase
-            .from('users')
-            .insert({
-              id: data.user.id,
-              email: data.user.email,
-              first_name: userData.firstName,
-              last_name: userData.lastName,
-              age: userData.age,
-              onboarding_status: false,
-              created_at: new Date().toISOString()
-            })
-
-          if (profileError) {
-            console.warn('Profile creation error:', profileError)
-          }
-        } catch (profileErr) {
-          console.warn('Profile creation failed:', profileErr)
-        }
+        email_confirmed_at: new Date().toISOString()
       }
+
+      user.value = mockUser
+      profile.value = createMockProfile(email, userData)
 
       return {
         success: true,
-        message: data.user?.email_confirmed_at
-          ? 'Account created successfully!'
-          : 'Account created! Please check your email for verification.'
+        message: 'Account created successfully! (Demo Mode)'
       }
     } catch (err) {
       const errorMessage = handleAuthError(err)
@@ -133,28 +92,27 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   /**
-   * Sign in existing user
+   * Sign in existing user (mock implementation)
    */
   const signIn = async (email, password) => {
     loading.value = true
     error.value = null
 
     try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000))
+
+      // Accept any credentials for demo
+      const mockUser = {
+        id: Date.now().toString(),
         email: email.trim().toLowerCase(),
-        password
-      })
-
-      if (signInError) throw signInError
-
-      user.value = data.user
-
-      // Fetch user profile
-      if (data.user) {
-        await fetchUserProfile(data.user.id)
+        email_confirmed_at: new Date().toISOString()
       }
 
-      return { success: true, message: 'Successfully signed in!' }
+      user.value = mockUser
+      profile.value = createMockProfile(email)
+
+      return { success: true, message: 'Successfully signed in! (Demo Mode)' }
     } catch (err) {
       const errorMessage = handleAuthError(err)
       error.value = errorMessage
@@ -165,15 +123,15 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   /**
-   * Sign out current user
+   * Sign out current user (mock implementation)
    */
   const signOut = async () => {
     loading.value = true
     error.value = null
 
     try {
-      const { error: signOutError } = await supabase.auth.signOut()
-      if (signOutError) throw signOutError
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       user.value = null
       profile.value = null
@@ -188,25 +146,19 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   /**
-   * Reset password
+   * Reset password (mock implementation)
    */
   const resetPassword = async (email) => {
     loading.value = true
     error.value = null
 
     try {
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-        email.trim().toLowerCase(),
-        {
-          redirectTo: `${window.location.origin}/reset-password`
-        }
-      )
-
-      if (resetError) throw resetError
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000))
 
       return {
         success: true,
-        message: 'Password reset email sent. Please check your inbox.'
+        message: 'Password reset email sent! (Demo Mode - Check console)'
       }
     } catch (err) {
       const errorMessage = handleAuthError(err)
@@ -218,45 +170,19 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   /**
-   * Initialize authentication state
+   * Initialize authentication state (mock implementation)
    */
   const initializeAuth = async () => {
-    try {
-      // Get current session
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    // In demo mode, no initialization needed
+    sessionInitialized.value = true
+  }
 
-      if (sessionError) {
-        console.warn('Session error:', sessionError)
-      }
-
-      user.value = session?.user || null
-
-      // Fetch profile if user exists
-      if (session?.user) {
-        await fetchUserProfile(session.user.id)
-      }
-
-      // Listen for auth state changes
-      supabase.auth.onAuthStateChange(async (event, session) => {
-        user.value = session?.user || null
-
-        if (session?.user) {
-          await fetchUserProfile(session.user.id)
-        } else {
-          profile.value = null
-        }
-
-        // Clear error on successful auth state change
-        if (event === 'SIGNED_IN') {
-          error.value = null
-        }
-      })
-
-      sessionInitialized.value = true
-    } catch (err) {
-      console.error('Auth initialization error:', err)
-      sessionInitialized.value = true
-    }
+  /**
+   * Fetch user profile data (mock implementation)
+   */
+  const fetchUserProfile = async (userId = null) => {
+    // Return existing profile or null
+    return profile.value
   }
 
   return {

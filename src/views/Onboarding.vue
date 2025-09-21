@@ -185,26 +185,25 @@ const handleSubmit = async () => {
   if (!isFormValid.value) return
 
   loading.value = true
-  
+
   try {
     // Calculate initial carbon footprint based on form data
     const carbonFootprint = calculateCarbonFootprint(form.value)
-    
-    // Save user profile to Supabase
-    const { error } = await supabase
-      .from('user_profiles')
-      .insert({
-        user_id: authStore.user.id,
-        transport_mode: form.value.transport,
-        weekly_miles: form.value.weeklyMiles,
-        home_type: form.value.homeType,
-        monthly_energy: form.value.monthlyEnergy,
-        diet_type: form.value.diet,
-        household_size: form.value.householdSize,
-        carbon_footprint: carbonFootprint
-      })
 
-    if (error) throw error
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1500))
+
+    // In demo mode, just update the auth store profile
+    if (authStore.profile) {
+      authStore.profile.transport_mode = form.value.transport
+      authStore.profile.weekly_miles = form.value.weeklyMiles
+      authStore.profile.home_type = form.value.homeType
+      authStore.profile.monthly_energy = form.value.monthlyEnergy
+      authStore.profile.diet_type = form.value.diet
+      authStore.profile.household_size = form.value.householdSize
+      authStore.profile.carbon_footprint = carbonFootprint
+      authStore.profile.onboarding_status = true
+    }
 
     router.push('/dashboard')
   } catch (err) {
